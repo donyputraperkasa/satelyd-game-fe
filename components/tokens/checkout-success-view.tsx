@@ -1,0 +1,82 @@
+"use client";
+
+import { CheckCircle2, MessageCircle } from "lucide-react";
+import type { TransactionOrder } from "@/types";
+
+interface CheckoutSuccessViewProps {
+  order: TransactionOrder;
+  onFinish: () => void;
+}
+
+export function CheckoutSuccessView({ order, onFinish }: CheckoutSuccessViewProps) {
+  const getWhatsAppUrl = () => {
+    const text =
+      `Halo Mas Dony / Admin Satelyd, saya telah melakukan transfer untuk top-up token kuis:\n\n` +
+      `• *ID Transaksi:* ${order.id}\n` +
+      `• *Paket:* ${order.packageName} (${order.tokenAmount} Token)\n` +
+      `• *Total Bayar:* Rp ${order.price.toLocaleString("id-ID")}\n` +
+      `• *Bank Tujuan:* ${order.paymentMethod}\n` +
+      `• *Pengirim:* ${order.senderAccount}\n` +
+      (order.referenceNumber ? `• *No. Referensi:* ${order.referenceNumber}\n\n` : `\n`) +
+      `Bukti transfer sudah saya upload di sistem. Mohon bantuannya untuk diverifikasi & di-admit ya mas. Terima kasih!`;
+
+    return `https://wa.me/6282236343404?text=${encodeURIComponent(text)}`;
+  };
+
+  return (
+    <div className="py-6 flex flex-col items-center text-center space-y-4">
+      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-xs">
+        <CheckCircle2 size={36} />
+      </div>
+
+      <div className="space-y-1">
+        <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 rounded-full">
+          ID Transaksi: {order.id}
+        </span>
+        <h3 className="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-[#F8FAFC] pt-1">
+          Konfirmasi Pesanan Terkirim!
+        </h3>
+        <p className="text-xs text-[#64748B] dark:text-[#94A3B8] max-w-sm leading-relaxed mx-auto">
+          Pesanan token Anda berhasil dicatat ke sistem dan menunggu verifikasi admit admin. Anda juga dapat konfirmasi langsung ke WhatsApp Mas Dony agar segera diaktifkan.
+        </p>
+      </div>
+
+      {/* Quick Order Summary Pill */}
+      <div className="w-full bg-[#F8FAFC] dark:bg-[#141720] border border-[#BAE6FD] dark:border-[#282E3E] rounded-2xl p-3.5 text-xs text-left space-y-1 font-mono">
+        <div className="flex justify-between font-sans">
+          <span className="text-[#64748B] dark:text-[#94A3B8]">Paket:</span>
+          <strong className="text-[#0F172A] dark:text-[#F8FAFC]">{order.packageName}</strong>
+        </div>
+        <div className="flex justify-between font-sans">
+          <span className="text-[#64748B] dark:text-[#94A3B8]">Total Bayar:</span>
+          <strong className="text-[#2E7D32] dark:text-emerald-400">Rp {order.price.toLocaleString("id-ID")}</strong>
+        </div>
+        <div className="flex justify-between font-sans">
+          <span className="text-[#64748B] dark:text-[#94A3B8]">Tujuan:</span>
+          <strong className="text-[#0F172A] dark:text-[#F8FAFC]">{order.paymentMethod}</strong>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="w-full flex flex-col gap-2.5 pt-2">
+        <a
+          href={getWhatsAppUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="h-11 w-full rounded-xl bg-[#25D366] text-white hover:bg-[#20BD5A] font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+        >
+          <MessageCircle size={17} />
+          <span>Konfirmasi via WhatsApp Mas Dony (0822-3634-3404)</span>
+        </a>
+
+        <button
+          type="button"
+          onClick={onFinish}
+          className="h-11 w-full rounded-xl border border-[#E2E8F0] dark:border-[#282E3E] bg-white dark:bg-[#141720] text-[#0F172A] dark:text-[#F8FAFC] font-bold text-xs hover:bg-[#F8FAFC] dark:hover:bg-[#282E3E] hover:border-[#0284C7] dark:hover:border-[#C67D00] transition cursor-pointer"
+        >
+          Selesai &amp; Kembali ke Toko
+        </button>
+      </div>
+    </div>
+  );
+}

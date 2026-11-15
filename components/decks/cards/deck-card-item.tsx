@@ -1,0 +1,80 @@
+"use client";
+
+import type { DeckCardItemProps } from "@/types";
+import { DeckActionsDropdown } from "./deck-actions-dropdown";
+import { DeckCardItemFooter } from "./deck-card-item-footer";
+import { DeckCardMetricsStrip } from "./deck-card-metrics-strip";
+import { DIFFICULTY_BADGES, getDeckSessionPin } from "../deck-constants";
+
+export function DeckCardItem({
+  deck,
+  onManageCards,
+  onEditDeck,
+  onDeleteDeck,
+  onPlayOnTv,
+  onExportToExam,
+}: DeckCardItemProps) {
+  const sessionPin = getDeckSessionPin(deck.id, deck.pinCode);
+  const cardCount = deck.cards ? deck.cards.length : deck.cardCount;
+  const totalPoints = deck.cards
+    ? deck.cards.reduce((sum, c) => sum + (c.points || 10), 0)
+    : cardCount * 10;
+  const estimatedSeconds = deck.cards
+    ? deck.cards.reduce((sum, c) => sum + (c.timerSeconds || 30), 0)
+    : cardCount * 30;
+
+  return (
+    <div className="group flex flex-col justify-between rounded-2xl border border-[#E2E8F0] dark:border-[#282E3E] bg-white dark:bg-[#1C202C] p-6 shadow-xs hover:border-[#C5A5B0] dark:hover:border-[#3D4760] hover:shadow-md transition-all duration-200">
+      <div>
+        {/* Top Badges & Dropdown Menu */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-lg bg-[#F0F9FF] dark:bg-[#252B39] border border-[#BAE6FD] dark:border-[#394253] px-2.5 py-1 text-xs font-bold text-[#0284C7] dark:text-[#F8FAFC]">
+              {deck.subject}
+            </span>
+            <span className="rounded-lg bg-[#F5EFEB] dark:bg-[#141720] border border-[#E2E8F0] dark:border-[#282E3E] px-2.5 py-1 text-xs font-semibold text-[#573E47] dark:text-[#94A3B8]">
+              {deck.gradeLevel}
+            </span>
+            {deck.difficulty && (
+              <span className={`rounded-lg border px-2 py-0.5 text-[11px] font-bold ${DIFFICULTY_BADGES[deck.difficulty] || DIFFICULTY_BADGES.SEDANG}`}>
+                {deck.difficulty}
+              </span>
+            )}
+          </div>
+
+          <DeckActionsDropdown
+            deck={deck}
+            onEdit={onEditDeck}
+            onExportToExam={onExportToExam}
+            onDelete={onDeleteDeck}
+          />
+        </div>
+
+        {/* Title & Description */}
+        <div className="mt-4">
+          <h3 className="text-lg sm:text-xl font-black text-[#0F172A] dark:text-[#F8FAFC] group-hover:text-[#6E1F33] dark:group-hover:text-[#F1F5F9] transition-colors leading-snug">
+            {deck.title}
+          </h3>
+          <p className="mt-2 text-xs sm:text-sm text-[#64748B] dark:text-[#94A3B8] line-clamp-2 leading-relaxed">
+            {deck.description || "Kumpulan kartu pertanyaan kuis interaktif untuk latihan harian dan evaluasi kelas."}
+          </p>
+        </div>
+
+        {/* Middle Metrics Strip */}
+        <DeckCardMetricsStrip
+          cardCount={cardCount}
+          estimatedSeconds={estimatedSeconds}
+          totalPoints={totalPoints}
+        />
+      </div>
+
+      {/* Footer Area with PIN Sesi TV & Buttons */}
+      <DeckCardItemFooter
+        deck={deck}
+        sessionPin={sessionPin}
+        onPlayOnTv={onPlayOnTv}
+        onManageCards={onManageCards}
+      />
+    </div>
+  );
+}

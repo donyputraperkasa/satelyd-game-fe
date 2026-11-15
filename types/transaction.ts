@@ -1,0 +1,132 @@
+import type { User } from "./user";
+
+export type TransactionStatus =
+  | "PENDING"
+  | "PAID"
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELLED";
+
+export interface TokenPackage {
+  id: string;
+  name: string;
+  itemType: "GAME" | "EXAM";
+  tokenAmount: number;
+  price: number;
+  normalPrice?: number;
+  discountBadge?: string;
+  description: string;
+  isPopular?: boolean;
+}
+
+export interface TransactionOrder {
+  id: string;
+  userId?: string;
+  userName: string;
+  userEmail: string;
+  schoolName: string;
+  packageName: string;
+  itemType: "GAME" | "EXAM" | "COMBO";
+  productType?: "GAME_TOKEN" | "EXAM_CREDIT";
+  tokenAmount: number;
+  quantity?: number;
+  price: number;
+  paymentMethod: string;
+  senderAccount: string;
+  referenceNumber: string;
+  proofImageUrl?: string;
+  adminNote?: string;
+  paidAt?: string;
+  createdAt: string;
+  status: TransactionStatus;
+}
+
+export interface TransactionTableProps {
+  orders: TransactionOrder[];
+  onOpenProof: (order: TransactionOrder) => void;
+  onAdmit: (orderId: string) => void;
+  onReject: (orderId: string) => void;
+}
+
+export interface TransactionRowProps {
+  order: TransactionOrder;
+  onOpenProof: (order: TransactionOrder) => void;
+  onAdmit: (orderId: string) => void;
+  onReject: (orderId: string) => void;
+}
+
+export interface TransactionStatsProps {
+  orders: TransactionOrder[];
+}
+
+export interface ProofModalProps {
+  isOpen: boolean;
+  order: TransactionOrder | null;
+  onClose: () => void;
+}
+
+export interface TokenUserHistoryProps {
+  user: User;
+}
+
+export interface TokenBalanceCardItemProps {
+  title: string;
+  icon: React.ReactNode;
+  balance: number;
+  label: string;
+  isUnlimited: boolean;
+  buttonLabel?: string;
+  onTopUp: () => void;
+}
+
+export interface TokenBalanceCardsProps {
+  gameTokenBalance: number;
+  examCreditBalance: number;
+  isUnlimited: boolean;
+  freeSessionsRemaining: number;
+  freeSessionsMax: number;
+  onBuyGameTokens: () => void;
+  onBuyExamCredits: () => void;
+}
+
+export interface TokenPackageCardProps {
+  pkg: TokenPackage;
+  onBuy: (pkg: TokenPackage) => void;
+}
+
+export interface TokenFreeTierCardProps {
+  freeSessionsRemaining: number;
+  freeSessionsMax: number;
+  freeUsagePercent: number;
+  className?: string;
+}
+
+
+export interface TokenQuickActionsProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  activeFilter: "ALL" | "GAME" | "EXAM";
+  onFilterChange: (filter: "ALL" | "GAME" | "EXAM") => void;
+  totalCount: number;
+}
+
+export interface TokenCheckoutModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  packageItem: TokenPackage | null;
+  user: User;
+}
+
+export interface CheckoutPackageSummaryProps {
+  pkg: TokenPackage;
+}
+
+export interface CheckoutSuccessViewProps {
+  pkg: TokenPackage;
+  onDone: () => void;
+}
+
+export interface BankLogoProps {
+  code: string;
+  className?: string;
+}

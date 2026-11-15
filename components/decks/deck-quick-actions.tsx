@@ -1,0 +1,74 @@
+"use client";
+
+import { Search, X, LayoutGrid, List } from "lucide-react";
+import type { DeckQuickActionsProps } from "@/types";
+
+export function DeckQuickActions({
+  searchQuery,
+  onSearchChange,
+  viewMode,
+  onViewModeChange,
+  totalCount,
+}: DeckQuickActionsProps) {
+  return (
+    <section className="rounded-2xl border border-[#E2E8F0] dark:border-[#282E3E] bg-white dark:bg-[#1C202C] p-3 sm:p-4 shadow-xs flex items-center justify-between gap-3 transition-colors overflow-hidden">
+      {/* Search Input Box */}
+      <div className="flex items-center gap-2.5 bg-[#F8FAFC] dark:bg-[#141720] border border-[#E2E8F0] dark:border-[#282E3E] focus-within:border-[#0284C7] dark:focus-within:border-[#C67D00] focus-within:bg-white dark:focus-within:bg-[#141720] rounded-xl px-3.5 py-2 flex-1 transition min-w-0">
+        <Search size={16} className="text-[#0F172A] dark:text-[#94A3B8] shrink-0" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Cari nama deck materi, topik, atau kata kunci..."
+          className="w-full min-w-0 bg-transparent text-xs sm:text-sm text-[#0F172A] dark:text-[#F8FAFC] placeholder-[#94A3B8] dark:placeholder-[#64748B] placeholder:font-normal focus:outline-none font-medium"
+          aria-label="Cari deck materi"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => onSearchChange("")}
+            className="text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC] transition p-1 rounded-md cursor-pointer shrink-0"
+            title="Hapus pencarian"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {/* View Mode Switcher: Card vs Table (Hidden on mobile) */}
+      <div className="hidden sm:flex items-center gap-2 shrink-0">
+        <span className="inline-block text-xs font-bold text-[#64748B] dark:text-[#94A3B8] mr-1">
+          {totalCount} Deck
+        </span>
+
+        <div className="flex items-center rounded-xl border border-[#E2E8F0] dark:border-[#282E3E] bg-[#F8FAFC] dark:bg-[#141720] p-1">
+          <button
+            type="button"
+            onClick={() => onViewModeChange("card")}
+            title="Tampilan Kartu (Grid)"
+            className={`p-1.5 rounded-lg transition cursor-pointer ${
+              viewMode === "card"
+                ? "bg-white dark:bg-[#282E3E] text-[#0F172A] dark:text-[#F8FAFC] shadow-xs font-bold"
+                : "text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC]"
+            }`}
+          >
+            <LayoutGrid size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={() => onViewModeChange("table")}
+            title="Tampilan Tabel"
+            className={`p-1.5 rounded-lg transition cursor-pointer ${
+              viewMode === "table"
+                ? "bg-white dark:bg-[#282E3E] text-[#0F172A] dark:text-[#F8FAFC] shadow-xs font-bold"
+                : "text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC]"
+            }`}
+          >
+            <List size={15} />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+

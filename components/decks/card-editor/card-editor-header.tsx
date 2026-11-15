@@ -1,0 +1,53 @@
+"use client";
+
+import { Layers, CheckCircle2, X } from "lucide-react";
+import type { CardEditorHeaderProps } from "@/types";
+
+export function CardEditorHeader({
+  title,
+  subject,
+  gradeLevel,
+  sessionPin,
+  isSavedToast,
+  onClose,
+}: CardEditorHeaderProps) {
+  return (
+    <div className="flex items-center justify-between border-b border-[#E2E8F0] bg-white px-3.5 sm:px-6 py-3 sm:py-4 shrink-0">
+      <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+        <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] shrink-0">
+          <Layers size={18} className="sm:w-5 sm:h-5" />
+        </div>
+        <div className="min-w-0">
+          <h2 className="text-sm sm:text-lg md:text-xl font-black text-[#0F172A] truncate tracking-tight">
+            {title}
+          </h2>
+          <div className="flex items-center gap-2 text-xs text-[#64748B] font-medium mt-0.5 flex-wrap">
+            <span className="font-semibold text-[#5B1C2E]">{subject}</span>
+            <span className="text-[#C5A5B0]">•</span>
+            <span>{gradeLevel}</span>
+            <span className="text-[#C5A5B0]">•</span>
+            <span className="font-mono font-bold text-[#0F172A]">
+              Token: {sessionPin}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 shrink-0 ml-3">
+        {isSavedToast && (
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[#2E7D32] bg-[#EDF7ED] border border-[#C8E6C9] px-2.5 py-1 rounded-lg">
+            <CheckCircle2 size={14} /> Tersimpan!
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-xl p-2 text-[#64748B] hover:bg-[#F0F9FF] hover:text-[#0284C7] transition cursor-pointer"
+          title="Tutup Modal"
+        >
+          <X size={20} />
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,82 @@
+"use client";
+
+import { Search, X } from "lucide-react";
+import type { TokenQuickActionsProps } from "@/types";
+
+export function TokenQuickActions({
+  searchQuery,
+  onSearchChange,
+  activeFilter,
+  onFilterChange,
+  totalCount,
+}: TokenQuickActionsProps) {
+  return (
+    <section className="rounded-2xl border border-[#E2E8F0] dark:border-[#282E3E] bg-white dark:bg-[#1C202C] p-3 sm:p-4 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 overflow-hidden">
+      {/* Search Input Box */}
+      <div className="flex items-center gap-2.5 bg-[#F8FAFC] dark:bg-[#141720] border border-[#E2E8F0] dark:border-[#282E3E] focus-within:border-[#0284C7] dark:focus-within:border-[#C67D00] focus-within:bg-white dark:focus-within:bg-[#1C202C] rounded-xl px-3.5 py-2 flex-1 transition min-w-0">
+        <Search size={16} className="text-[#0F172A] dark:text-[#FBBF24] shrink-0" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Cari paket kuota, nominal, game, atau ujian..."
+          className="w-full min-w-0 bg-transparent text-xs sm:text-sm text-[#0F172A] dark:text-[#F8FAFC] placeholder-[#94A3B8] dark:placeholder-[#64748B] placeholder:font-normal focus:outline-none font-medium"
+          aria-label="Cari paket token"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => onSearchChange("")}
+            className="text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC] transition p-1 rounded-md cursor-pointer shrink-0"
+            title="Hapus pencarian"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {/* Filter Switcher & Count (Hidden on mobile) */}
+      <div className="hidden sm:flex items-center justify-end gap-2 shrink-0">
+        <span className="text-xs font-bold text-[#64748B] dark:text-[#94A3B8] sm:mr-1 shrink-0">
+          {totalCount} Paket
+        </span>
+
+        <div className="flex items-center rounded-xl border border-[#E2E8F0] dark:border-[#282E3E] bg-[#F8FAFC] dark:bg-[#141720] p-1 overflow-x-auto max-w-full no-scrollbar">
+          <button
+            type="button"
+            onClick={() => onFilterChange("ALL")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
+              activeFilter === "ALL"
+                ? "bg-white dark:bg-[#282E3E] text-[#0F172A] dark:text-[#F8FAFC] shadow-xs"
+                : "text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC]"
+            }`}
+          >
+            Semua
+          </button>
+          <button
+            type="button"
+            onClick={() => onFilterChange("GAME")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
+              activeFilter === "GAME"
+                ? "bg-white dark:bg-[#282E3E] text-[#0F172A] dark:text-[#F8FAFC] shadow-xs"
+                : "text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC]"
+            }`}
+          >
+            Token Game
+          </button>
+          <button
+            type="button"
+            onClick={() => onFilterChange("EXAM")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
+              activeFilter === "EXAM"
+                ? "bg-white dark:bg-[#282E3E] text-[#0F172A] dark:text-[#F8FAFC] shadow-xs"
+                : "text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC]"
+            }`}
+          >
+            Token Ujian
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}

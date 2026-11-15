@@ -1,0 +1,160 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { Gamepad2, GraduationCap, Loader2, Sparkles } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { checkGameRoom, fetchExamByToken, fetchDeckByPinOrId, fetchGameSessionByPin } from "@/services";
+import type { PinModalProps } from "@/types";
+import { BaseModal } from "./base-modal";
+
+export function PinModal({
+  isOpen,
+  onClose,
+  onSwitchToLogin,
+  onSwitchToRegister,
+}: PinModalProps) {
+  const router = useRouter();
+  const [mode, setMode] = useState<"game" | "exam">("game");
+  const [pin, setPin] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const cleanPin = pin.trim().toUpperCase();
+    if (!cleanPin) return;
+
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setIsLoading(true);
+
+    try {
+      if (mode === "game") {
+        // 1. Coba periksa apakah ini sesi TV aktif atau Deck game yang valid
+        const session = await fetchGameSessionByPin(cleanPin);
+        if (session) {
+          setSuccessMsg(`Sesi game "${session.pinCode}" valid! Membuka arena game...`);
+          setTimeout(() => {
+            onClose();
+            router.push(`/game/${encodeURIComponent(session.pinCode)}`);
+          }, 600);
+          return;
+        }
+
+        // Fallback: Siapa tahu user mengetik Token Ujian saat berada di tab Game
+        const exam = await fetchExamByToken(cleanPin);
+        if (exam) {
+          setSuccessMsg(`Token Ujian "${exam.title}" ditemukan! Mengalihkan ke lembar ujian...`);
+          setTimeout(() => {
+            onClose();
+            router.push(`/exam/${encodeURIComponent(exam.tokenCode)}`);
+          }, 600);
+          return;
+        }
+
+        // Jika keduanya tidak ditemukan
+        throw new Error(`PIN Game "${cleanPin}" tidak ditemukan. Pastikan kode sesuai dengan layar guru atau TV.`);
+      } else {
+        // Mode Ujian
+        const exam = await fetchExamByToken(cleanPin);
+        if (exam) {
+          setSuccessMsg(`Ujian "${exam.title}" valid! Mengalihkan ke lembar ujian...`);
+          setTimeout(() => {
+            onClose();
+            router.push(`/exam/${encodeURIComponent(exam.tokenCode)}`);
+          }, 600);
+          return;
+        }
+
+        // Fallback: Siapa tahu user mengetik PIN Game saat berada di tab Ujian
+        const session = await fetchGameSessionByPin(cleanPin);
+        if (session) {
+          setSuccessMsg(`PIN Game "${session.pinCode}" valid! Mengalihkan ke arena game...`);
+          setTimeout(() => {
+            onClose();
+            router.push(`/game/${encodeURIComponent(session.pinCode)}`);
+          }, 600);
+          return;
+        }
+
+        throw new Error(`Token Ujian "${cleanPin}" tidak ditemukan. Pastikan token sesuai dengan yang dibagikan guru.`);
+      }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "PIN/Kode tidak ditemukan");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <BaseModal isOpen={isOpen} onClose={onClose}>
+      <div className="mb-6 text-center">
+        <h2 className="font-display text-2xl font-bold text-[#0F172A] dark:text-[#F8FAFC]">Masukkan PIN Sesi</h2>
+        <p className="mt-1 text-xs sm:text-sm text-[#64748B] dark:text-[#94A3B8]">
+          {mode === "game" ? "Ketik 4-6 karakter kode di TV kelas (cth: TV-H3U0)" : "Masukkan token ujian dari guru"}
+        </p>
+      </div>
+
+      <div className="mb-6 flex rounded-full bg-[#F1F5F9] dark:bg-[#141720] p-1.5 border border-[#E2E8F0] dark:border-[#282E3E]">
+        <button
+          type="button"
+          onClick={() => { setMode("game"); setErrorMsg(null); setSuccessMsg(null); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition cursor-pointer ${
+            mode === "game"
+              ? "bg-[#0284C7] dark:bg-white text-white dark:text-[#10131B] shadow-sm"
+              : "text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC]"
+          }`}
+        >
+          <Gamepad2 size={16} /> Game TV Kelas
+        </button>
+        <button
+          type="button"
+          onClick={() => { setMode("exam"); setErrorMsg(null); setSuccessMsg(null); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition cursor-pointer ${
+            mode === "exam"
+              ? "bg-[#0284C7] dark:bg-white text-white dark:text-[#10131B] shadow-sm"
+              : "text-[#64748B] dark:text-[#94A3B8] hover:text-[#0284C7] dark:hover:text-[#F8FAFC]"
+          }`}
+        >
+          <GraduationCap size={16} /> Ujian Sekolah
+        </button>
+      </div>
+
+      {errorMsg && (
+        <div className="mb-4 rounded-lg bg-[#FBEAEB] dark:bg-rose-950/40 border border-[#F2C2C6] dark:border-rose-900/60 p-2.5 text-xs text-[#8A1F2D] dark:text-rose-300 text-center">{errorMsg}</div>
+      )}
+      {successMsg && (
+        <div className="mb-4 rounded-lg bg-[#EBF7EE] dark:bg-emerald-950/40 border border-[#B9E5C2] dark:border-emerald-800/60 p-2.5 text-xs text-[#1D6C31] dark:text-emerald-400 text-center font-medium">{successMsg}</div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          required
+          maxLength={45}
+          value={pin}
+          onChange={(e) => setPin(e.target.value.toUpperCase())}
+          placeholder={mode === "game" ? "CTH: TV-H3U0 / H3U0" : "TEMPEL TOKEN UJIAN"}
+          className={`w-full text-center font-mono font-black rounded-xl border-2 border-[#E2E8F0] hover:border-[#BAE6FD] dark:border-[#282E3E] bg-[#F8FAFC] dark:bg-[#141720] py-2.5 px-4 text-[#0F172A] dark:text-[#F8FAFC] placeholder-[#94A3B8] dark:placeholder-[#64748B] transition focus:bg-white dark:focus:bg-[#141720] focus:border-[#0284C7] focus:outline-none focus:ring-2 focus:ring-[#0284C7]/20 uppercase ${
+            pin.length > 12 ? "text-sm sm:text-base tracking-wider" : "text-xl sm:text-2xl tracking-[0.2em]"
+          }`}
+        />
+
+        <button
+          type="submit"
+          disabled={isLoading || !pin.trim()}
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0284C7] hover:bg-[#0369A1] py-3 text-sm font-bold text-white shadow-md shadow-[#0284C7]/25 hover:shadow-lg hover:shadow-[#0284C7]/35 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 cursor-pointer"
+        >
+          {isLoading ? <><Loader2 size={16} className="animate-spin" /> Memeriksa PIN...</> : "Gabung Sekarang"}
+        </button>
+      </form>
+
+      <div className="mt-6 flex flex-wrap justify-center gap-3 border-t border-[#E2E8F0] dark:border-[#282E3E] pt-4 text-xs text-[#64748B] dark:text-[#94A3B8]">
+        <button type="button" onClick={onSwitchToLogin} className="text-[#0F172A] dark:text-[#FBBF24] font-semibold hover:underline cursor-pointer">Login Akun</button>
+        <span>•</span>
+        <button type="button" onClick={onSwitchToRegister} className="text-[#0F172A] dark:text-[#FBBF24] font-semibold hover:underline cursor-pointer">Daftar Akun Baru</button>
+      </div>
+    </BaseModal>
+  );
+}
